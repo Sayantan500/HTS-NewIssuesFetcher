@@ -4,12 +4,11 @@
   "path": "/path/to/resource",
   "httpMethod": "GET",
   "queryStringParameters": {
-    "r_s": "1",
-    "r_e": "10"
+    "r_s": "1682332028199",
+    "limit": "2"
   },
   "pathParameters": {
-    "proxy": "path/to/resource",
-    "username": "1905829"
+    "proxy": "path/to/resource"
   },
   "stageVariables": {
     "baz": "qux"
