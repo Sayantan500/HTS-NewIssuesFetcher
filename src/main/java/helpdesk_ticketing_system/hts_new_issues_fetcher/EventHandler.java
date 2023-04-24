@@ -4,10 +4,10 @@ import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.net.HttpURLConnection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -24,10 +24,14 @@ public class EventHandler implements RequestHandler<APIGatewayProxyRequestEvent,
 
     @Override
     public APIGatewayProxyResponseEvent handleRequest(APIGatewayProxyRequestEvent requestEvent, Context context) {
+        Map<String,String> header = new HashMap<>();
+        header.put("Content-Type","application/json; charset=utf-8");
+
         if(requestEvent==null)
             return new APIGatewayProxyResponseEvent()
                     .withStatusCode(HttpURLConnection.HTTP_INTERNAL_ERROR)
-                    .withBody("Received Null Request from API Gateway");
+                    .withHeaders(header)
+                    .withBody("\"message\":\"Received Null Request from API Gateway\"");
 
         context.getLogger().log("request event : " + requestEvent + "\n");
 
@@ -43,8 +47,9 @@ public class EventHandler implements RequestHandler<APIGatewayProxyRequestEvent,
             try {
                 return new APIGatewayProxyResponseEvent()
                         .withStatusCode(HttpURLConnection.HTTP_BAD_REQUEST)
-                        .withBody(objectMapper.writeValueAsString("\"message\":\"Query Parameter 'r_s' is not present.\""));
-            } catch (JsonProcessingException e) {
+                        .withHeaders(header)
+                        .withBody("\"message\":\"Query Parameter 'r_s' is not present.\"");
+            } catch (Exception e) {
                 context.getLogger().log(
                         "Exception Class : " + e.getClass().getName() + "\tMessage : " + e.getMessage() + "\n"
                 );
@@ -82,13 +87,15 @@ public class EventHandler implements RequestHandler<APIGatewayProxyRequestEvent,
 
                 return new APIGatewayProxyResponseEvent()
                         .withStatusCode(HttpURLConnection.HTTP_OK)
+                        .withHeaders(header)
                         .withBody(objectMapper.writeValueAsString(response));
             }
             return new APIGatewayProxyResponseEvent()
                     .withStatusCode(HttpURLConnection.HTTP_OK)
+                    .withHeaders(header)
                     .withBody(objectMapper.writeValueAsString(response));
         }
-        catch (JsonProcessingException e) {
+        catch (Exception e) {
             context.getLogger().log(
                     "Exception Class : " + e.getClass().getName() + "\tMessage : " + e.getMessage() + "\n"
             );
